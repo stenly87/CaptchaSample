@@ -86,6 +86,17 @@ namespace CaptchaSample
                 x += 8 + random.Next(-5, 10);
                 y = 13 + random.Next(-5, 5);
             }
+            var line = new Line();
+            line.X1 = random.Next(5, 10);
+            line.X2 = 50 + random.Next(5, 15);
+            line.Y1 = random.Next(15, 20);
+            line.Y2 = random.Next(10, 15);
+            line.Stroke = Brushes.Black;
+            line.StrokeThickness = 2;
+
+            captchCanvas.Children.Add(line);
+            Canvas.SetLeft(line, random.Next(5, 15));
+            Canvas.SetTop(line, random.Next(5, 15));
         }
 
         private bool CaptchaValid()
