@@ -62,7 +62,8 @@ namespace CaptchaSample
             else
             {// открыть следующую форму и тп 
              // лучше менять страницу на следующую
-
+                new WinProductList(user).Show();
+                Close();
             }
         }
 
