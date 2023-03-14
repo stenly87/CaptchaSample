@@ -9,14 +9,14 @@
     <Window.Resources>
         <DataTemplate x:Key="productView">
             <Border BorderThickness="1" BorderBrush="Black">
-                <Grid>
+                <Grid Background="{Binding ProductBackground}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition />
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Border Padding="5" BorderThickness="1" BorderBrush="Black" Margin="3">
-                        <Image Source="{Binding ImageSource}" Width="200" Stretch="UniformToFill"/>
+                        <Image Source="{Binding ProductPhoto}" Width="200" Stretch="UniformToFill"/>
                     </Border>
                     <Border Padding="5" Grid.Column="1" BorderThickness="1" BorderBrush="Black" Margin="3">
                         <StackPanel >
@@ -47,7 +47,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition />
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition />
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
@@ -57,8 +57,24 @@
             <Button Content="Выход" Click="buttonExitToLogin"/>
         </StackPanel>
 
+        <StackPanel Grid.Row="1">
+            <Label Content="Поиск" Width="200"/>
+            <TextBox Text="{Binding SearchText,
+                UpdateSourceTrigger=PropertyChanged}" />
+            <Label Content="Производитель"/>
+            <ComboBox ItemsSource="{Binding Manufactorers}"
+                      DisplayMemberPath="ProductManufacturer"
+                      SelectedItem="{Binding SelectedManufactorer,
+                UpdateSourceTrigger=PropertyChanged}"/>
+            <Label Content="Сортировка"/>
+            <ComboBox ItemsSource="{Binding Sorting}"
+                      SelectedIndex="{Binding SelectedSorting,
+                UpdateSourceTrigger=PropertyChanged}"/>
+        </StackPanel>
+
         <!--Список товаров-->
-        <ListBox Grid.ColumnSpan="3"
+        <ListBox Grid.Column="1"
+                 Grid.ColumnSpan="2"
                  Grid.Row="1"
                  HorizontalContentAlignment="Stretch"
                  ItemsSource="{Binding Products}" 

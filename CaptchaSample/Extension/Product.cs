@@ -13,25 +13,12 @@ namespace CaptchaSample
 {
     public partial class Product
     {
-        BitmapImage image = null;
-        public BitmapImage ImageSource 
-        { 
-            get {
-                if (image != null)
-                    return image;
-                if (ProductPhoto == null)
-                    return null;
-
-                string path = $"{ProductArticleNumber}.png";
-                File.WriteAllBytes(path, ProductPhoto);
-                image = new BitmapImage();
-                image.BeginInit();
-                image.CacheOption = BitmapCacheOption.OnLoad;
-                
-                image.UriSource = new Uri(path, UriKind.Relative);
-                image.EndInit();
-                return image;
-            }
-        }
+        public Brush ProductBackground { get
+            {
+                if (ProductQuantityInStock == "0")
+                    return Brushes.Gray;
+                else
+                    return Brushes.White;
+            } }
     }
 }
