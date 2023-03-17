@@ -9,7 +9,7 @@
     <Window.Resources>
         <DataTemplate x:Key="productView">
             <Border BorderThickness="1" BorderBrush="Black">
-                <Grid Background="{Binding ProductBackground}">
+                <Grid Background="{Binding ProductBackground}" Mouse.MouseDown="EditProduct">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition />
@@ -34,7 +34,7 @@
                     <Border Padding="5" Grid.Column="2" BorderThickness="1" BorderBrush="Black" Margin="3">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding ProductQuantityInStock, StringFormat=Кол-во {0}}"/>
-                            <TextBlock Text="{Binding PtoductUnitPtoductUnit}"/>
+                            <TextBlock Text="{Binding PtoductUnit}"/>
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -43,6 +43,7 @@
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition />
         </Grid.RowDefinitions>
@@ -57,7 +58,8 @@
             <Button Content="Выход" Click="buttonExitToLogin"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="1">
+        <StackPanel Grid.Row="1" Grid.RowSpan="2">
+            <TextBlock Text="{Binding CountView}"/>
             <Label Content="Поиск" Width="200"/>
             <TextBox Text="{Binding SearchText,
                 UpdateSourceTrigger=PropertyChanged}" />
@@ -72,13 +74,27 @@
                 UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
 
+        <StackPanel Visibility="{Binding IsAdminVisibility}" Grid.Column="1" Grid.Row="1" Orientation="Horizontal">
+            <Button Content="Добавить" Click="AddProduct"/>
+            <Button Content="Удалить" Click="RemoveProduct"/>
+        </StackPanel>
+
         <!--Список товаров-->
         <ListBox Grid.Column="1"
                  Grid.ColumnSpan="2"
-                 Grid.Row="1"
+                 Grid.Row="2"
                  HorizontalContentAlignment="Stretch"
                  ItemsSource="{Binding Products}" 
                  ItemTemplate="{StaticResource productView}"
-                 SelectedItem="{Binding SelectedProduct}"/>
+                 SelectedItem="{Binding SelectedProduct}"
+                 >
+            <ListBox.ContextMenu>
+                <ContextMenu Visibility="{Binding IsAdminVisibility}">
+                    <MenuItem Header="Добавить" Click="AddProduct"/>
+                    <MenuItem Header="Редактировать" Click="EditProduct"/>
+                    <MenuItem Header="Удалить" Click="RemoveProduct"/>
+                </ContextMenu>
+            </ListBox.ContextMenu>
+        </ListBox>
     </Grid>
 </Window>

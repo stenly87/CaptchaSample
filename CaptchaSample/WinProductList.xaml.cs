@@ -21,9 +21,11 @@ namespace CaptchaSample
     /// </summary>
     public partial class WinProductList : Window, INotifyPropertyChanged
     {
+        public string CountView { get; set; }
+
         public string FIO { get; }
         private readonly User user;
-        private string searchText;
+        private string searchText = "";
         private int selectedSorting;
         private Manufacturer selectedManufactorer;
 
@@ -35,7 +37,8 @@ namespace CaptchaSample
         public List<Manufacturer> Manufactorers { get; set; }
         public List<Product> Products { get; set; }
         public List<string> Sorting { get; set; } = new List<string>() { "Без сортировки", "Стоимость по убыванию", "Стоимость по возрастанию" };
-        
+        public Visibility IsAdminVisibility { get; set; }
+
         public int SelectedSorting
         {
             get => selectedSorting;
@@ -68,6 +71,7 @@ namespace CaptchaSample
         {
             var result = DB.Instance.Products.
                 Include(s => s.ProductProvider).
+                Include(s => s.OrderProducts).
                 Include(s => s.ProductManufacturer).
                 Include(s => s.ProductCategory).Where(s =>
                     s.ProductProvider.ProductProvider.Contains(searchText) ||
@@ -85,16 +89,23 @@ namespace CaptchaSample
                 result = result.OrderBy(s => s.ProductCost);
             Products = result.ToList();
             Signal(nameof(Products));
+
+            CountView = $"Записей: {Products.Count} из {DB.Instance.Products.Count()}";
+            Signal(nameof(CountView));
         }
 
         public WinProductList(User user)
         {
             InitializeComponent();
+
             this.user = user;
             FIO = $"{user.UserSurname} {user.UserName} {user.UserPatronymic}";
-
+            IsAdminVisibility = 
+                user.UserRole == 1 ? // Администратор
+                Visibility.Visible :
+                Visibility.Collapsed;
             FillManufactorers();
-            FillProducts();
+            Search();
             DataContext = this;
         }
 
@@ -107,18 +118,55 @@ namespace CaptchaSample
             selectedManufactorer = Manufactorers.FirstOrDefault();
         }
 
-        private void FillProducts()
-        {
-            Products = DB.Instance.Products.
-                Include(s => s.ProductProvider).
-                Include(s => s.ProductManufacturer).
-                Include(s => s.ProductCategory).ToList();
-        }
 
         private void buttonExitToLogin(object sender, RoutedEventArgs e)
         {
             new MainWindow().Show();
             Close();
+        }
+
+        private void AddProduct(object sender, RoutedEventArgs e)
+        {
+            new WinProductEdit(new Product()).ShowDialog();
+            Search();
+        }
+
+        private void EditProduct(object sender, RoutedEventArgs e)
+        {
+            if (SelectedProduct != null)
+            {
+                new WinProductEdit(SelectedProduct).ShowDialog();
+                Search();
+            }
+        }
+
+        private void RemoveProduct(object sender, RoutedEventArgs e)
+        {
+            if (SelectedProduct != null)
+            {
+                if (SelectedProduct.OrderProducts.Count == 0)
+                {
+                    if (MessageBox.Show("Удалить выбранный товар?", "Внимание!", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    {
+                        DB.Instance.Products.Remove(SelectedProduct);
+                        DB.Instance.SaveChanges();
+                        Search();
+                    }
+                }
+                else
+                    MessageBox.Show("Выбранный товар нельзя удалить, поскольку он фигурирует в заказах");
+            }
+        }
+
+        private void EditProduct(object sender, MouseButtonEventArgs e)
+        {
+            if (user.UserRole != 1)
+                return;
+            if (SelectedProduct != null)
+            {
+                new WinProductEdit(SelectedProduct).ShowDialog();
+                Search();
+            }
         }
     }
 }
